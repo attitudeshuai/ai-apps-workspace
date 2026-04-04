@@ -1,6 +1,9 @@
 # Session workspaces
 /session-*/
 
+# Prompts (local only)
+/prompts/session-4.md
+
 # Environment files
 .env
 .env.*
