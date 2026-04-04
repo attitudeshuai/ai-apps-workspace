@@ -1,0 +1,18 @@
+# Session workspaces
+/session-*/
+
+# Environment files
+.env
+.env.*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and caches
+*.log
+logs/
+node_modules/
+__pycache__/
