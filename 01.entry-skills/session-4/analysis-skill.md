@@ -39,8 +39,6 @@ description: "Use when: 需要先让用户提供项目名，再读取 02.work se
 1. `02.work session/session-4/ai-model-result/<项目名>.md`——从中找到"用户第 N 次提示词"作为本次分析的 prompt，以及对应的"模型第 N 次回答内容"作为执行结果
 2. `02.work session/session-4/gitlab source/<项目名>/`——确认实际代码状态
 
-**不再**从 `03.trae prompts/session-4.md` 中查找提示词。
-
 ## 分析目标
 
 你需要回答三个问题：
