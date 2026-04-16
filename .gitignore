@@ -3,6 +3,9 @@
 !/02.work session/session-4/gitlab source/
 /02.work session/session-gcs
 
+github-gitlab-access-token.md
+label-01223-0414-*.md
+
 # Environment files
 .env
 .env.*
