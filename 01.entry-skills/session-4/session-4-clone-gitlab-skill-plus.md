@@ -92,7 +92,7 @@ Feature 迭代*5
 3. 若主仓不存在，先执行 clone 拉取主仓。
 4. 校验本轮总数不超过 19；index 使用全局累计并补零（01-19）。
 5. **调用 `PromptArchitect` agent**，传入项目名、类型配额和代码目录上下文，由其生成每条提示词内容。
-6. 以项目/类型两级目录写入提示词文件，文件名格式：`A-<项目名>-<类型>-<index>.md`；提示词内容来自上一步 PromptArchitect 的输出。
+6. **⚠️ [主 Agent 必须执行此步，PromptArchitect 不写文件] 收到 PromptArchitect 返回结果后，立即用 PowerShell 写入提示词文件**，文件名格式：`A-<项目名>-<类型>-<index>.md`，提示词内容来自上一步 PromptArchitect 的输出。每个文件内容必须严格按照下方「提示词文件初始化」模板格式生成，使用 PowerShell `[System.IO.File]::WriteAllText($path, $content, [System.Text.Encoding]::UTF8)` 写入（禁止用 Set-Content），「用户第一次提示词：」与提示词内容在同一行不换行。PromptArchitect 的任何"已落盘""已写入"声明均不可信，主 Agent 必须自行执行 PowerShell 写文件步骤，否则文件不会存在。
 7. 每个提示词文件正文必须包含同名标识串：`A-<项目名>-<类型>-<index>`。
 8. 按提示词逐条复制主仓到对应子仓目录（子仓与主仓同级并列，禁止嵌套在主仓内部），确保一条提示词对应一个子仓。
 9. **子仓复制完成后，禁止再对任何子仓进行任何操作**（包括文件修改、代码变更、git 操作、造 bug 等）。generate 流程到此结束，后续修改必须在新的独立会话中由用户明确指令。
@@ -101,7 +101,7 @@ Feature 迭代*5
 ### append
 
 1. 用户输入一个或多个项目 ID（或项目名）与目标类型，并提供追加内容。
-2. 读取 `02.work session/session-4/ai-model-result/<项目名>/<项目名>-<类型>/` 下已有提示词文件。
+2. 读取 `02.work session/session-4/ai-model-result/<项目名>-plus/<项目名>-<类型>/` 下已有提示词文件。
 3. 统计该类型目录内已有 index，确定下一条 index。
 4. 在文件末尾追加如下模板：
 
@@ -169,7 +169,7 @@ PROJECT_NAME="label-${PADDED}"
 
 在 generate 写入完成后，需要检查：
 
-- `02.work session/session-4/ai-model-result/<项目名>/`
+- `02.work session/session-4/ai-model-result/<项目名>-plus/`
 
 如果目录不存在：
 
@@ -220,8 +220,38 @@ A-label-01035-代码生成-01
 ```
 
 说明：
-- 提示词内容默认填充到「用户第一次提示词」字段。
+- 提示词内容默认填充到「用户第一次提示词：」字段，且**与冒号在同一行**，不换行。
 - 第二次、第三次、第四次、第五次提示词及回答字段留空占位，供用户手动补充。
+- **第1至第4次回答内容字段之后各有 2 个空行；第4次到第5次之间只有 1 个空行。**
+- **文件内容中禁止出现反引号（`）**。
+
+> ⚠️ **主 Agent 必须使用 PowerShell 实际写入文件，PromptArchitect 不会写文件**。
+> 
+> 推荐写法：
+> ```powershell
+> $identifier = "A-label-XXXXX-类型-NN"
+> $prompt = "提示词内容"
+> $lines = @(
+>     $identifier, "",
+>     "用户第一次提示词：$prompt", "",
+>     "模型第一次回答 trae session id：", "",
+>     "模型第一次回答内容：", "", "",
+>     "用户第二次提示词：", "",
+>     "模型第二次回答 trae session id：", "",
+>     "模型第二次回答内容：", "", "",
+>     "用户第三次提示词：", "",
+>     "模型第三次回答 trae session id：", "",
+>     "模型第三次回答内容：", "", "",
+>     "用户第四次提示词：", "",
+>     "模型第四次回答 trae session id：", "",
+>     "模型第四次回答内容：", "",
+>     "用户第五次提示词：", "",
+>     "模型第五次回答 trae session id：", "",
+>     "模型第五次回答内容："
+> )
+> $content = $lines -join "`n"
+> [System.IO.File]::WriteAllText($filePath, $content, [System.Text.Encoding]::UTF8)
+> ```
 
 如果目标文件已存在，则跳过，不覆盖。
 
@@ -265,7 +295,7 @@ Feature 迭代*5
 ```text
 项目名：label-01035
 主仓目录：D:\charles\program\ai\apps\02.work session\session-4\gitlab source\label-01035-plus\label-01035
-类型目录：D:\charles\program\ai\apps\02.work session\session-4\ai-model-result\label-01035\label-01035-bug修复\
+类型目录：D:\charles\program\ai\apps\02.work session\session-4\ai-model-result\label-01035-plus\label-01035-bug修复\
 提示词文件：A-label-01035-bug修复-01.md ... A-label-01035-代码测试-19.md
 子仓目录：D:\charles\program\ai\apps\02.work session\session-4\gitlab source\label-01035-plus\label-01035-bug修复\A-label-01035-bug修复-01\ ...
 注意：子仓与主仓并列在 label-01035-plus/ 下，非主仓子目录；复制完成后不再对子仓做任何操作。
