@@ -21,3 +21,5 @@ Thumbs.db
 logs/
 node_modules/
 __pycache__/
+
+temp_*

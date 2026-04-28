@@ -91,8 +91,8 @@ Feature 迭代*5
 2. 标准化项目名（如 `1035 -> label-01035`，带后缀时如 `1035 -plus -> label-01035-plus`）。
 3. 若主仓不存在，先执行 clone 拉取主仓。
 4. 校验本轮总数不超过 19；index 使用全局累计并补零（01-19）。
-5. **调用 `PromptArchitect` agent**，传入项目名、类型配额和代码目录上下文，由其生成每条提示词内容。
-6. **⚠️ [主 Agent 必须执行此步，PromptArchitect 不写文件] 收到 PromptArchitect 返回结果后，立即用 PowerShell 写入提示词文件**，文件名格式：`A-<项目名>-<类型>-<index>.md`，提示词内容来自上一步 PromptArchitect 的输出。每个文件内容必须严格按照下方「提示词文件初始化」模板格式生成，使用 PowerShell `[System.IO.File]::WriteAllText($path, $content, [System.Text.Encoding]::UTF8)` 写入（禁止用 Set-Content），「用户第一次提示词：」与提示词内容在同一行不换行。PromptArchitect 的任何"已落盘""已写入"声明均不可信，主 Agent 必须自行执行 PowerShell 写文件步骤，否则文件不会存在。
+5. **调用 `promptarchitect(.github\agents\PromptArchitect.agent.md)` agent**，传入项目名、类型配额和代码目录上下文，由其生成每条提示词内容。
+6. **⚠️ [主 Agent 必须执行此步，promptarchitect(.github\agents\PromptArchitect.agent.md) 不写文件] 收到 promptarchitect(.github\agents\PromptArchitect.agent.md) 返回结果后，立即用 PowerShell 写入提示词文件**，文件名格式：`A-<项目名>-<类型>-<index>.md`，提示词内容来自上一步 promptarchitect(.github\agents\PromptArchitect.agent.md) 的输出。每个文件内容必须严格按照下方「提示词文件初始化」模板格式生成，使用 PowerShell `[System.IO.File]::WriteAllText($path, $content, [System.Text.Encoding]::UTF8)` 写入（禁止用 Set-Content），「用户第一次提示词：」与提示词内容在同一行不换行。promptarchitect(.github\agents\PromptArchitect.agent.md) 的任何"已落盘""已写入"声明均不可信，主 Agent 必须自行执行 PowerShell 写文件步骤，否则文件不会存在。
 7. 每个提示词文件正文必须包含同名标识串：`A-<项目名>-<类型>-<index>`。
 8. 按提示词逐条复制主仓到对应子仓目录（子仓与主仓同级并列，禁止嵌套在主仓内部），确保一条提示词对应一个子仓。
 9. **子仓复制完成后，禁止再对任何子仓进行任何操作**（包括文件修改、代码变更、git 操作、造 bug 等）。generate 流程到此结束，后续修改必须在新的独立会话中由用户明确指令。
@@ -225,7 +225,7 @@ A-label-01035-代码生成-01
 - **第1至第4次回答内容字段之后各有 2 个空行；第4次到第5次之间只有 1 个空行。**
 - **文件内容中禁止出现反引号（`）**。
 
-> ⚠️ **主 Agent 必须使用 PowerShell 实际写入文件，PromptArchitect 不会写文件**。
+> ⚠️ **主 Agent 必须使用 PowerShell 实际写入文件，promptarchitect(.github\agents\PromptArchitect.agent.md) 不会写文件**。
 > 
 > 推荐写法：
 > ```powershell

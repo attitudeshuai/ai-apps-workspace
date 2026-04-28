@@ -24,7 +24,7 @@ apps/
 
 ### .github/
 
-存放工作区级别的 agent 和 instruction 配置，用来约束 PromptArchitect、分析流程等行为。
+存放工作区级别的 agent 和 instruction 配置，用来约束 promptarchitect(.github\agents\PromptArchitect.agent.md)、分析流程等行为。
 
 ### [pre-work]workflow steps/
 
